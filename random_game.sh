@@ -1,4 +1,24 @@
 #!/bin/bash
+#
+# Random Batocera Game Selector
+# Version: 2.0
+# Description: Randomly selects a game from ALL Batocera emulators for boot
+# Author: thehack904
+# License: GPL-3.0
+#
+# Version History:
+#   v1.0 - Original script (MAME only)
+#   v2.0 - Extended to support all Batocera emulators (110+ file extensions)
+#          across all platforms (Nintendo, Sega, Sony, Atari, Arcade, etc.)
+#
+
+VERSION="2.0"
+
+# Handle command line arguments
+if [ "$1" = "--version" ] || [ "$1" = "-v" ]; then
+    echo "Random Batocera Game Selector v${VERSION}"
+    exit 0
+fi
 
 # Collect all game files from all emulator directories
 files=()
