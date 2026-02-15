@@ -25,7 +25,7 @@ NC='\033[0m' # No Color
 print_header() {
     echo -e "${BLUE}"
     echo "╔════════════════════════════════════════════════════════════╗"
-    echo "║   Random Batocera Game Selector - Installer v${VERSION}        ║"
+    echo "║   Random Batocera Game Selector - Installer v${VERSION}           ║"
     echo "╚════════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
 }
