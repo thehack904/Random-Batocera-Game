@@ -6,7 +6,7 @@ for emulator_dir in /userdata/roms/*/; do
     # Skip if directory doesn't exist or is empty
     if [ -d "$emulator_dir" ]; then
         # Find all game files with extensions supported by Batocera emulators
-        # This includes 100+ extensions across all platforms (Nintendo, Sega, Sony, 
+        # This includes 110+ extensions across all platforms (Nintendo, Sega, Sony, 
         # Microsoft, Atari, Arcade, Computers, Handhelds, etc.)
         while IFS= read -r -d '' file; do
             files+=("$file")

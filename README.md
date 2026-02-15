@@ -1,7 +1,7 @@
 # Random-Batocera-Game
 Start random game on boot up for Batocera
 
-This script will start a random game from **ALL** Batocera emulators every time the system boots up. It's fun to never know what game or system you might get! The script supports **100+ file extensions** across all Batocera platforms including:
+This script will start a random game from **ALL** Batocera emulators every time the system boots up. It's fun to never know what game or system you might get! The script supports **110+ file extensions** across all Batocera platforms including:
 
 - **Nintendo**: NES, SNES, N64, GameBoy, GBA, GameCube, Wii, Wii U, 3DS, DS, Virtual Boy
 - **Sega**: Master System, Game Gear, Genesis/Mega Drive, 32X, Sega CD, Saturn, Dreamcast
