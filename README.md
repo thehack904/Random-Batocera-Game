@@ -17,23 +17,83 @@ The script scans all emulator directories in /userdata/roms/ and randomly picks 
 
 Enjoy!
 
-To setup:
-Start your Batocera system and select any game from any emulator, set the game's advanced settings (Hold A or south button) and scroll down and set to start on boot
+## Installation
 
-    Open a command line window or ssh into your Batocera system
-    Type: cd /userdata/system
-    Type: vi random_game.sh
-    Type: i
-    Paste contents of script below
-    Press esc
-    Type: :wq!
-    Type: chmod +x random_game.sh
-    Type: echo /userdata/system/random_game.sh >> /userdata/system/custom.sh
-    (If you don’t have a custom.sh already) Type: chmod +x /userdata/system/custom.sh
-    Type: /userdata/system/random_game.sh
+### Easy Installation (Recommended)
 
-That should change the first game you selected to a new game for the next boot/reboot.
-To check that it works, reboot.
+The easiest way to install is using the automated installer:
+
+1. **SSH into your Batocera system** or open a terminal
+2. **Download and run the installer:**
+   ```bash
+   cd /tmp
+   wget https://raw.githubusercontent.com/thehack904/Random-Batocera-Game/main/install.sh
+   chmod +x install.sh
+   ./install.sh
+   ```
+   
+   Or if you have the repository cloned:
+   ```bash
+   cd /path/to/Random-Batocera-Game
+   ./install.sh
+   ```
+
+3. **Configure a boot game** (if not already done):
+   - Select any game in EmulationStation
+   - Press 'A' (or South button) for Game Options
+   - Go to 'Advanced Game Options'
+   - Enable 'Boot this game on startup'
+
+4. **Reboot** and enjoy your random game!
+
+**To uninstall:**
+```bash
+./install.sh uninstall
+```
+
+### Manual Installation
+
+If you prefer to install manually:
+
+1. **Configure a boot game first:**
+   - Start your Batocera system and select any game from any emulator
+   - Set the game's advanced settings (Hold A or south button)
+   - Scroll down and set to start on boot
+
+2. **Install the script:**
+   ```bash
+   # SSH into your Batocera system
+   cd /userdata/system
+   
+   # Download the script
+   wget https://raw.githubusercontent.com/thehack904/Random-Batocera-Game/main/random_game.sh
+   
+   # Make it executable
+   chmod +x random_game.sh
+   
+   # Add to custom.sh
+   echo "/userdata/system/random_game.sh" >> /userdata/system/custom.sh
+   chmod +x /userdata/system/custom.sh
+   
+   # Test it
+   /userdata/system/random_game.sh
+   ```
+
+3. **Reboot** to verify it works
+
+## Usage
+
+Once installed, the script runs automatically on each boot, selecting a random game.
+
+**Check the version:**
+```bash
+/userdata/system/random_game.sh --version
+```
+
+**Manually run to change boot game:**
+```bash
+/userdata/system/random_game.sh
+```
 
 ## Version History
 
