@@ -31,6 +31,13 @@ new_game="${files[RANDOM % ${#files[@]}]}"
 # Get the current boot game from batocera.conf
 old_game=$(grep global.bootgame.cmd /userdata/system/batocera.conf | awk '{print $NF}')
 
+# Check if old_game was found
+if [ -z "$old_game" ]; then
+    echo "Error: No boot game configured in batocera.conf"
+    echo "Please configure a game to start on boot first, then run this script again."
+    exit 1
+fi
+
 # Replace the old game with the new game in batocera.conf
 # Use a more precise pattern that matches the entire line
 sed -i "s|^\(global\.bootgame\.cmd.*\)${old_game}|\1${new_game}|g" /userdata/system/batocera.conf
