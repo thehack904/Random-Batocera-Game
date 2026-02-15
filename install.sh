@@ -57,13 +57,85 @@ check_batocera() {
     fi
 }
 
+# Detect installed version
+detect_version() {
+    if [ ! -f "$SCRIPT_PATH" ]; then
+        echo "none"
+        return
+    fi
+    
+    # Try to get version from --version flag (v2.0+)
+    if [ -x "$SCRIPT_PATH" ]; then
+        local version_output=$("$SCRIPT_PATH" --version 2>/dev/null)
+        if [ $? -eq 0 ] && [[ "$version_output" =~ v?([0-9]+\.[0-9]+) ]]; then
+            echo "${BASH_REMATCH[1]}"
+            return
+        fi
+    fi
+    
+    # Check if it has version header comment (v2.0+)
+    if grep -q "^# Version:" "$SCRIPT_PATH" 2>/dev/null; then
+        local ver=$(grep "^# Version:" "$SCRIPT_PATH" | head -1 | awk '{print $3}')
+        if [ -n "$ver" ]; then
+            echo "$ver"
+            return
+        fi
+    fi
+    
+    # Check script characteristics to identify v1.0
+    # v1.0 characteristics: short script, uses backticks, hardcoded mame path
+    if grep -q "/userdata/roms/mame/\*\.zip" "$SCRIPT_PATH" 2>/dev/null; then
+        if ! grep -q "# Version:" "$SCRIPT_PATH" 2>/dev/null; then
+            echo "1.0"
+            return
+        fi
+    fi
+    
+    # Unknown version
+    echo "unknown"
+}
+
+# Show upgrade information
+show_upgrade_info() {
+    local old_version="$1"
+    
+    echo ""
+    print_info "═══════════════════════════════════════════════════════════"
+    print_warning "UPGRADE DETECTED: v${old_version} → v${VERSION}"
+    print_info "═══════════════════════════════════════════════════════════"
+    echo ""
+    
+    if [ "$old_version" = "1.0" ]; then
+        echo "  What's new in v2.0:"
+        echo "  ✓ Support for ALL Batocera emulators (not just MAME)"
+        echo "  ✓ 112 file extensions across all platforms"
+        echo "  ✓ Nintendo, Sega, Sony, Atari, and many more systems"
+        echo "  ✓ Improved error handling and validation"
+        echo "  ✓ Modern bash syntax and optimizations"
+        echo "  ✓ Version tracking with --version flag"
+        echo ""
+        print_info "Your random game selection will now include your ENTIRE collection!"
+        echo ""
+    else
+        echo "  Upgrading from version ${old_version}"
+        echo ""
+    fi
+    
+    read -p "Continue with upgrade? (Y/n): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Nn]$ ]]; then
+        print_info "Upgrade cancelled"
+        exit 0
+    fi
+}
+
 # Backup existing installation
 backup_existing() {
     if [ -f "$SCRIPT_PATH" ]; then
         BACKUP_PATH="${SCRIPT_PATH}.backup.$(date +%Y%m%d_%H%M%S)"
         print_info "Backing up existing installation to ${BACKUP_PATH}"
         cp "$SCRIPT_PATH" "$BACKUP_PATH"
-        print_success "Backup created"
+        print_success "Backup created: $(basename $BACKUP_PATH)"
     fi
 }
 
@@ -234,6 +306,17 @@ main() {
             ;;
         install|*)
             check_batocera
+            
+            # Detect current version
+            CURRENT_VERSION=$(detect_version)
+            
+            if [ "$CURRENT_VERSION" != "none" ]; then
+                # Show upgrade information
+                show_upgrade_info "$CURRENT_VERSION"
+            else
+                print_info "No existing installation found - performing fresh install"
+            fi
+            
             backup_existing
             install_script
             configure_custom_sh
