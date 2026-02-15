@@ -5,12 +5,17 @@ files=()
 for emulator_dir in /userdata/roms/*/; do
     # Skip if directory doesn't exist or is empty
     if [ -d "$emulator_dir" ]; then
-        # Add all common game file extensions
-        for ext in zip nes snes sfc n64 z64 v64 gba gb gbc nds smd bin gen md sms gg sg cue iso chd pbp 7z ccd img; do
-            while IFS= read -r -d '' file; do
-                files+=("$file")
-            done < <(find "$emulator_dir" -maxdepth 1 -type f -iname "*.$ext" -print0 2>/dev/null)
-        done
+        # Find all game files with common extensions in one pass
+        while IFS= read -r -d '' file; do
+            files+=("$file")
+        done < <(find "$emulator_dir" -maxdepth 1 -type f \( \
+            -iname "*.zip" -o -iname "*.nes" -o -iname "*.snes" -o -iname "*.sfc" -o \
+            -iname "*.n64" -o -iname "*.z64" -o -iname "*.v64" -o -iname "*.gba" -o \
+            -iname "*.gb" -o -iname "*.gbc" -o -iname "*.nds" -o -iname "*.smd" -o \
+            -iname "*.bin" -o -iname "*.gen" -o -iname "*.md" -o -iname "*.sms" -o \
+            -iname "*.gg" -o -iname "*.sg" -o -iname "*.cue" -o -iname "*.iso" -o \
+            -iname "*.chd" -o -iname "*.pbp" -o -iname "*.7z" -o -iname "*.ccd" -o \
+            -iname "*.img" \) -print0 2>/dev/null)
     fi
 done
 
@@ -24,9 +29,10 @@ fi
 new_game="${files[RANDOM % ${#files[@]}]}"
 
 # Get the current boot game from batocera.conf
-old_game=`grep global.bootgame.cmd /userdata/system/batocera.conf | awk '{print $NF}'`
+old_game=$(grep global.bootgame.cmd /userdata/system/batocera.conf | awk '{print $NF}')
 
 # Replace the old game with the new game in batocera.conf
-sed -i "s|$old_game|$new_game|g" /userdata/system/batocera.conf
+# Use a more precise pattern that matches the entire line
+sed -i "s|^\(global\.bootgame\.cmd.*\)${old_game}|\1${new_game}|g" /userdata/system/batocera.conf
 
 echo "Selected random game: $new_game"
