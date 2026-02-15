@@ -61,18 +61,18 @@ check_batocera() {
 
 # Check for legacy v1.0 installation
 check_legacy_v1() {
-    local found_legacy=0
+    local found_legacy=1  # 1 = false (not found)
     
     # Check for old v1.0 script file
     if [ -f "$OLD_V1_SCRIPT_PATH" ]; then
         print_warning "Found legacy v1.0 installation at: $OLD_V1_SCRIPT_PATH"
-        found_legacy=1
+        found_legacy=0  # 0 = true (found)
     fi
     
     # Check for old references in custom.sh
     if [ -f "$CUSTOM_SH" ] && grep -q "$OLD_V1_SCRIPT_PATH" "$CUSTOM_SH"; then
         print_warning "Found legacy v1.0 reference in custom.sh"
-        found_legacy=1
+        found_legacy=0  # 0 = true (found)
     fi
     
     return $found_legacy
@@ -87,7 +87,10 @@ cleanup_legacy_v1() {
         # Backup the old script first
         BACKUP_PATH="${OLD_V1_SCRIPT_PATH}.backup.$(date +%Y%m%d_%H%M%S)"
         print_info "Backing up legacy script to ${BACKUP_PATH}"
-        cp "$OLD_V1_SCRIPT_PATH" "$BACKUP_PATH"
+        if ! cp "$OLD_V1_SCRIPT_PATH" "$BACKUP_PATH"; then
+            print_error "Failed to backup legacy script. Aborting cleanup for safety."
+            return 1
+        fi
         
         # Remove the old script
         rm "$OLD_V1_SCRIPT_PATH"
