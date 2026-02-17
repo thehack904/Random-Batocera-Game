@@ -88,7 +88,10 @@ if [ -z "$old_game" ]; then
 fi
 
 # Replace the old game with the new game in batocera.conf
-# Use a more precise pattern that matches the entire line
+# Update global.bootgame.cmd - use a more precise pattern that matches the entire line
 sed -i "s|^\(global\.bootgame\.cmd.*\)${old_game}|\1${new_game}|g" /userdata/system/batocera.conf
+
+# Update global.bootgame.path to point to the new game
+sed -i "s|^global\.bootgame\.path=.*|global.bootgame.path=${new_game}|g" /userdata/system/batocera.conf
 
 echo "Selected random game: $new_game"
