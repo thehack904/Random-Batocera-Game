@@ -81,12 +81,19 @@ new_game="${files[RANDOM % ${#files[@]}]}"
 # This handles characters like &, \, and / that have special meaning in sed
 escaped_game=$(echo "$new_game" | sed 's/[&/\]/\\&/g')
 
+# Extract just the filename from the full path for game-specific settings
+new_game_file=$(basename "$new_game")
+escaped_filename=$(echo "$new_game_file" | sed 's/[&/\]/\\&/g')
+
 # Check if boot game is configured in batocera.conf
 if ! grep -q "global.bootgame.cmd" /userdata/system/batocera.conf; then
     echo "Error: No boot game configured in batocera.conf"
     echo "Please configure a game to start on boot first, then run this script again."
     exit 1
 fi
+
+# Extract the system name from the boot command
+system=$(grep "global.bootgame.cmd" /userdata/system/batocera.conf | grep -oP '\-system \K[^ ]+')
 
 # Replace the old game with the new game in batocera.conf
 # Update the -rom parameter in global.bootgame.cmd
@@ -97,5 +104,8 @@ sed -i "s|\(-systemname \)[^ ]*|\1${escaped_game}|" /userdata/system/batocera.co
 
 # Update global.bootgame.path to point to the new game
 sed -i "s|^global\.bootgame\.path=.*|global.bootgame.path=${escaped_game}|" /userdata/system/batocera.conf
+
+# Update any system-specific game settings (e.g., mame["game.zip"].setting=value)
+sed -i "s|^${system}\[\"[^\"]*\"\]|${system}[\"${escaped_filename}\"]|g" /userdata/system/batocera.conf
 
 echo "Selected random game: $new_game"
