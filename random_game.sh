@@ -77,19 +77,19 @@ fi
 # Randomly select a game
 new_game="${files[RANDOM % ${#files[@]}]}"
 
-# Get the current boot game from batocera.conf
-old_game=$(grep global.bootgame.cmd /userdata/system/batocera.conf | awk '{print $NF}')
-
-# Check if old_game was found
-if [ -z "$old_game" ]; then
+# Check if boot game is configured in batocera.conf
+if ! grep -q "global.bootgame.cmd" /userdata/system/batocera.conf; then
     echo "Error: No boot game configured in batocera.conf"
     echo "Please configure a game to start on boot first, then run this script again."
     exit 1
 fi
 
 # Replace the old game with the new game in batocera.conf
-# Update global.bootgame.cmd - use a more precise pattern that matches the entire line
-sed -i "s|^\(global\.bootgame\.cmd.*\)${old_game}|\1${new_game}|g" /userdata/system/batocera.conf
+# Update the -rom parameter in global.bootgame.cmd
+sed -i "s|\(-rom \)[^ ]*|\1${new_game}|" /userdata/system/batocera.conf
+
+# Update the -systemname parameter in global.bootgame.cmd
+sed -i "s|\(-systemname \)[^ ]*|\1${new_game}|" /userdata/system/batocera.conf
 
 # Update global.bootgame.path to point to the new game
 sed -i "s|^global\.bootgame\.path=.*|global.bootgame.path=${new_game}|" /userdata/system/batocera.conf
