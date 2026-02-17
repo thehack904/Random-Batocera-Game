@@ -92,6 +92,6 @@ fi
 sed -i "s|^\(global\.bootgame\.cmd.*\)${old_game}|\1${new_game}|g" /userdata/system/batocera.conf
 
 # Update global.bootgame.path to point to the new game
-sed -i "s|^global\.bootgame\.path=.*|global.bootgame.path=${new_game}|g" /userdata/system/batocera.conf
+sed -i "s|^global\.bootgame\.path=.*|global.bootgame.path=${new_game}|" /userdata/system/batocera.conf
 
 echo "Selected random game: $new_game"
