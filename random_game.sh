@@ -95,6 +95,17 @@ fi
 # Extract the system name from the boot command
 system=$(grep "global.bootgame.cmd" /userdata/system/batocera.conf | grep -oP '\-system \K[^ ]+')
 
+# Validate that system was extracted successfully
+if [ -z "$system" ]; then
+    echo "Warning: Could not extract system name from boot command"
+    echo "Skipping system-specific settings update"
+    system_update_needed=false
+else
+    # Escape special regex characters in system name for safe sed usage
+    escaped_system=$(echo "$system" | sed 's/[.[\*^$]/\\&/g')
+    system_update_needed=true
+fi
+
 # Replace the old game with the new game in batocera.conf
 # Update the -rom parameter in global.bootgame.cmd
 sed -i "s|\(-rom \)[^ ]*|\1${escaped_game}|" /userdata/system/batocera.conf
@@ -106,6 +117,8 @@ sed -i "s|\(-systemname \)[^ ]*|\1${escaped_game}|" /userdata/system/batocera.co
 sed -i "s|^global\.bootgame\.path=.*|global.bootgame.path=${escaped_game}|" /userdata/system/batocera.conf
 
 # Update any system-specific game settings (e.g., mame["game.zip"].setting=value)
-sed -i "s|^${system}\[\"[^\"]*\"\]|${system}[\"${escaped_filename}\"]|g" /userdata/system/batocera.conf
+if [ "$system_update_needed" = true ]; then
+    sed -i "s|^${escaped_system}\[\"[^\"]*\"\]|${escaped_system}[\"${escaped_filename}\"]|g" /userdata/system/batocera.conf
+fi
 
 echo "Selected random game: $new_game"
