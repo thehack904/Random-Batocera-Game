@@ -46,6 +46,11 @@ The easiest way to install is using the automated installer:
 
 4. **Reboot** and enjoy your random game!
 
+**To upgrade to the latest version:**
+```bash
+./install.sh upgrade
+```
+
 **To uninstall:**
 ```bash
 ./install.sh uninstall

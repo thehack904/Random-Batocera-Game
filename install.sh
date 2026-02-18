@@ -360,8 +360,60 @@ show_usage() {
     echo ""
     echo "Options:"
     echo "  install     Install Random Batocera Game Selector (default)"
+    echo "  upgrade     Upgrade to the latest version"
     echo "  uninstall   Remove the installation"
     echo "  --help      Show this help message"
+    echo ""
+}
+
+# Perform upgrade
+upgrade() {
+    check_batocera
+    
+    # Detect current version
+    CURRENT_VERSION=$(detect_version)
+    
+    if [ "$CURRENT_VERSION" = "none" ]; then
+        print_error "No existing installation found"
+        print_info "Use './install.sh install' to perform a fresh installation"
+        exit 1
+    fi
+    
+    print_info "Current version: ${CURRENT_VERSION}"
+    print_info "Latest version: ${VERSION}"
+    
+    # Check if already at latest version
+    if [ "$CURRENT_VERSION" = "$VERSION" ]; then
+        print_warning "Already at the latest version (${VERSION})"
+        read -p "Reinstall anyway? (y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            print_info "Upgrade cancelled"
+            exit 0
+        fi
+    else
+        # Show upgrade information
+        show_upgrade_info "$CURRENT_VERSION"
+    fi
+    
+    # Check for and handle legacy v1.0 installation
+    if check_legacy_v1; then
+        print_info "Legacy v1.0 installation detected"
+        cleanup_legacy_v1
+    fi
+    
+    backup_existing
+    install_script
+    configure_custom_sh
+    check_boot_game
+    test_installation
+    
+    echo ""
+    print_success "Upgrade complete!"
+    echo ""
+    print_info "Next steps:"
+    echo "  1. Test the script: ${SCRIPT_PATH}"
+    echo "  2. Reboot to see a random game selected!"
     echo ""
 }
 
@@ -373,6 +425,9 @@ main() {
     case "${1:-install}" in
         uninstall)
             uninstall
+            ;;
+        upgrade)
+            upgrade
             ;;
         --help|-h)
             show_usage
